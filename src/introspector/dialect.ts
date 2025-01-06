@@ -1,8 +1,10 @@
 import type { Dialect as KyselyDialect } from 'kysely';
 import { DataApiDriverConfig } from 'kysely-data-api/dist/cjs/data-api-driver';
+import { DialectName } from '../generator';
 import type { Introspector } from './introspector';
 
 export type CreateKyselyDialectOptions = {
+  dialectName?: DialectName;
   connectionString: string;
   connection?: DataApiDriverConfig;
   ssl?: boolean;

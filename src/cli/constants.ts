@@ -34,4 +34,5 @@ export const VALID_DIALECTS = [
   'kysely-bun-sqlite',
   'worker-bun-sqlite',
   'rds-postgres',
+  'rds-mysql',
 ];

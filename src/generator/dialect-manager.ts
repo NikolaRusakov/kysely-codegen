@@ -19,9 +19,11 @@ export type DialectName =
   | 'postgres'
   | 'sqlite'
   | 'worker-bun-sqlite'
-  | 'rds-postgres';
+  | 'rds-postgres'
+  | 'rds-mysql';
 
 type DialectManagerOptions = {
+  dialectName?: DialectName;
   dateParser?: DateParser;
   domains?: boolean;
   numericParser?: NumericParser;
@@ -54,7 +56,9 @@ export class DialectManager {
       case 'worker-bun-sqlite':
         return new WorkerBunSqliteDialect();
       case 'rds-postgres':
-        return new RDSPostgresDialect();
+        return new RDSPostgresDialect(this.#options);
+      case 'rds-mysql':
+        return new RDSPostgresDialect(this.#options);
       default:
         return new SqliteDialect();
     }

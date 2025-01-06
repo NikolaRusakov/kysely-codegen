@@ -1,4 +1,5 @@
 import { DataApiDialect } from 'kysely-data-api';
+import { DialectName } from '../../../generator';
 import type { CreateKyselyDialectOptions } from '../../dialect';
 import { IntrospectorDialect } from '../../dialect';
 import { DateParser, DEFAULT_DATE_PARSER } from './date-parser';
@@ -37,13 +38,25 @@ export class RDSPostgresIntrospectorDialect extends IntrospectorDialect {
     if (options.connection == null) {
       throw new Error('missing RDS Data-api config');
     }
+
     const dataApi = new DataApiDialect({
-      mode: 'postgres',
+      mode: this.parseModeOption(options.dialectName),
       driver: {
         ...options.connection,
       },
     });
 
     return dataApi;
+  }
+
+  parseModeOption(dialectName?: DialectName) {
+    switch (dialectName) {
+      case 'rds-mysql':
+        return 'mysql';
+      case 'rds-postgres':
+        return 'postgres';
+      default:
+        return 'postgres';
+    }
   }
 }

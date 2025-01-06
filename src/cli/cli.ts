@@ -85,6 +85,7 @@ export class Cli {
     }
 
     const dialectManager = new DialectManager({
+      dialectName: options.dialectName,
       dateParser: options.dateParser ?? DEFAULT_DATE_PARSER,
       domains: !!options.domains,
       numericParser: options.numericParser ?? DEFAULT_NUMERIC_PARSER,

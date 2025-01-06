@@ -6,6 +6,7 @@ import { LibsqlDialect } from './dialects/libsql/libsql-dialect';
 import { MssqlDialect } from './dialects/mssql/mssql-dialect';
 import { MysqlDialect } from './dialects/mysql/mysql-dialect';
 import { PostgresDialect } from './dialects/postgres/postgres-dialect';
+import { RDSPostgresDialect } from './dialects/rds-postgres/rds-postgres-dialect';
 import { SqliteDialect } from './dialects/sqlite/sqlite-dialect';
 import { WorkerBunSqliteDialect } from './dialects/worker-bun-sqlite/worker-bun-sqlite-dialect';
 
@@ -17,7 +18,8 @@ export type DialectName =
   | 'mysql'
   | 'postgres'
   | 'sqlite'
-  | 'worker-bun-sqlite';
+  | 'worker-bun-sqlite'
+  | 'rds-postgres';
 
 type DialectManagerOptions = {
   dateParser?: DateParser;
@@ -51,6 +53,8 @@ export class DialectManager {
       case 'bun-sqlite': // Legacy.
       case 'worker-bun-sqlite':
         return new WorkerBunSqliteDialect();
+      case 'rds-postgres':
+        return new RDSPostgresDialect();
       default:
         return new SqliteDialect();
     }

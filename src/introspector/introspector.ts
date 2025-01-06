@@ -1,10 +1,12 @@
 import { Kysely, sql } from 'kysely';
+import { DataApiDriverConfig } from 'kysely-data-api/dist/cjs/data-api-driver';
 import type { IntrospectorDialect } from './dialect';
 import type { DatabaseMetadata } from './metadata/database-metadata';
 import { TableMatcher } from './table-matcher';
 
 type ConnectOptions = {
   connectionString: string;
+  connection?: DataApiDriverConfig;
   dialect: IntrospectorDialect;
 };
 
@@ -30,12 +32,16 @@ export abstract class Introspector<DB> {
       try {
         const dialect = await options.dialect.createKyselyDialect({
           connectionString: options.connectionString,
+          connection: options.connection,
           ssl,
         });
 
         const db = new Kysely<DB>({ dialect });
 
         await this.establishDatabaseConnection(db);
+        // const tables = (
+        //   await sql`select * from information_schema.tables;`.execute(db)
+        // ).rows;
 
         return db;
       } catch (error) {

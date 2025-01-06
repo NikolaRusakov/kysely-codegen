@@ -70,7 +70,7 @@ export class Cli {
     const logger = new Logger(options.logLevel);
 
     const connectionStringParser = new ConnectionStringParser();
-    const { connectionString, inferredDialectName } =
+    const { connectionString, inferredDialectName, connection } =
       connectionStringParser.parse({
         connectionString: options.url ?? DEFAULT_URL,
         dialectName: options.dialectName,
@@ -96,6 +96,7 @@ export class Cli {
 
     const db = await dialect.introspector.connect({
       connectionString,
+      connection,
       dialect,
     });
 

@@ -1,5 +1,7 @@
+import { RDSData } from '@aws-sdk/client-rds-data';
 import { config as loadEnv } from 'dotenv';
 import { expand as expandEnv } from 'dotenv-expand';
+import { DataApiDriverConfig } from 'kysely-data-api/dist/cjs/data-api-driver';
 import type { DialectName } from './dialect-manager';
 import type { Logger } from './logger/logger';
 
@@ -19,6 +21,7 @@ type ParseConnectionStringOptions = {
 type ParsedConnectionString = {
   connectionString: string;
   inferredDialectName: DialectName;
+  connection?: DataApiDriverConfig;
 };
 
 /**
@@ -51,6 +54,10 @@ export class ConnectionStringParser {
 
   parse(options: ParseConnectionStringOptions): ParsedConnectionString {
     let connectionString = options.connectionString;
+
+    let database = '';
+    let secretArn = '';
+    let resourceArn = '';
 
     const expressionMatch = connectionString.match(CALL_STATEMENT_REGEXP);
 
@@ -94,6 +101,7 @@ export class ConnectionStringParser {
       options.logger?.info(`Loaded environment variables from '${envFile}'.`);
 
       const envConnectionString = process.env[key];
+
       if (!envConnectionString) {
         throw new ReferenceError(
           `Environment variable '${key}' could not be found.`,
@@ -101,6 +109,9 @@ export class ConnectionStringParser {
       }
 
       connectionString = envConnectionString;
+      database = process.env['database'] ?? '';
+      secretArn = process.env['secretArn'] ?? '';
+      resourceArn = process.env['resourceArn'] ?? '';
     }
 
     const parts = connectionString.match(DIALECT_PARTS_REGEXP)!;
@@ -111,10 +122,20 @@ export class ConnectionStringParser {
 
     const inferredDialectName =
       options.dialectName ?? this.#inferDialectName(connectionString);
-
+    const connection: DataApiDriverConfig = {
+      client: new RDSData(),
+      database,
+      secretArn,
+      resourceArn,
+    };
+    const isRDSempty =
+      database.length === 0 ||
+      secretArn.length === 0 ||
+      resourceArn.length === 0;
     return {
       connectionString: normalizedConnectionString,
       inferredDialectName,
+      connection: isRDSempty ? undefined : connection,
     };
   }
 }
